@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pulse Meter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+    }
+    #rectangle {
+      width: 200px;
+      height: 100px;
+      margin: 20px auto;
+      display: none;
+    }
+    button, select {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 20px; /* збільшений шрифт */
+    }
+    p {
+      max-width: 600px;
+      margin: 10px auto;
+      font-size: 18px;
+    }
+    #inputBlock {
+      display: none;
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    #inputBlock input {
+      font-size: 20px;
+      padding: 5px;
+      width: 120px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    #inputBlock button {
+      font-size: 20px;
+      padding: 6px 14px;
+      margin-top: 15px;
+    }
+    #result {
+      margin-top: 25px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Pulse Meter</h2>
+  <p>
+    Instructions:<br/>Select the duration (10, 20 or 30 seconds) and click <b>Start</b>.  
+    After 5 seconds, a green rectangle will appear – this is the start point.  
+    Count your pulse beats until the rectangle turns red.  
+  </p>
+
+  <p>Select duration to measure:</p>
+  <select id="timeSelect">
+    <option value="10">10 seconds</option>
+    <option value="20">20 seconds</option>
+    <option value="30">30 seconds</option>
+  </select>
+  <br>
+  <button id="startBtn">Start</button>
+
+  <div id="rectangle"></div>
+
+  <!-- новий звичайний блок замість модального -->
+  <div id="inputBlock">
+    <p>Enter the number of beats you counted:</p>
+    <input type="number" id="pulseInput" min="1">
+    <br>
+    <button id="submitBtn">OK</button>
+  </div>
+
+  <div id="result"></div>
+  
+  <div style="margin-top:20px; font-size:18px; text-align:center;">
+  For more details on optimal heart rates by age and sex, visit
+  <a href="https://en.wikipedia.org/wiki/Heart_rate" target="_blank" rel="noopener">
+    Heart Rate (Wikipedia)
+  </a>
+</div>
+
+
+  <script>
+    const startBtn = document.getElementById("startBtn");
+    const timeSelect = document.getElementById("timeSelect");
+    const rectangle = document.getElementById("rectangle");
+    const inputBlock = document.getElementById("inputBlock");
+    const pulseInput = document.getElementById("pulseInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const result = document.getElementById("result");
+
+    let userSeconds = 10;
+
+    startBtn.addEventListener("click", () => {
+      rectangle.style.display = "none";
+      inputBlock.style.display = "none";
+      result.textContent = "";
+
+      setTimeout(() => {
+        rectangle.style.display = "block";
+        rectangle.style.backgroundColor = "green";
+
+        userSeconds = parseInt(timeSelect.value, 10);
+
+        setTimeout(() => {
+          rectangle.style.backgroundColor = "red";
+          // тепер показуємо поле для вводу
+          inputBlock.style.display = "block";
+        }, userSeconds * 1000);
+      }, 5000);
+    });
+
+    submitBtn.addEventListener("click", () => {
+      const beats = parseInt(pulseInput.value, 10);
+      if (!isNaN(beats) && beats > 0) {
+        const bpm = Math.round(beats * (60 / userSeconds));
+        result.textContent = `Your pulse rate is approximately ${bpm} beats per minute.`;
+      } else {
+        result.textContent = "Invalid input.";
+      }
+      pulseInput.value = "";
+      inputBlock.style.display = "none";
+    });
+
+    // Enter для підтвердження
+    pulseInput.addEventListener("keyup", (e) => {
+      if (e.key === "Enter") {
+        submitBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
